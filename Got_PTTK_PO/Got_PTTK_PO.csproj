@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>aspnet-Got_PTTK_PO-7F28E195-23B5-4D58-B039-A45EE91A94FF</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\20210117002156_NormyOdznakiSezony.cs" />
+    <Compile Remove="Data\Migrations\20210117002156_NormyOdznakiSezony.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210121182512_InsertMoreData.cs" />
+    <Compile Remove="Data\Migrations\20210121182512_InsertMoreData.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210121183609_AddTourists.cs" />
+    <Compile Remove="Data\Migrations\20210121183609_AddTourists.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210121183715_AddTourists.cs" />
+    <Compile Remove="Data\Migrations\20210121183715_AddTourists.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210121184500_AddTourists.cs" />
+    <Compile Remove="Data\Migrations\20210121184500_AddTourists.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210121190228_AddTourists.cs" />
+    <Compile Remove="Data\Migrations\20210121190228_AddTourists.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210123080237_turysci.cs" />
+    <Compile Remove="Data\Migrations\20210123080237_turysci.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210124152524_zdjecie.cs" />
+    <Compile Remove="Data\Migrations\20210124152524_zdjecie.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210125020554_WylaczenieTrasy.cs" />
+    <Compile Remove="Data\Migrations\20210125020554_WylaczenieTrasy.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210125021127_WylaczenieTrasy.cs" />
+    <Compile Remove="Data\Migrations\20210125021127_WylaczenieTrasy.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
+    <PackageReference Include="Mock" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\evidence\" />
+  </ItemGroup>
+
+</Project>

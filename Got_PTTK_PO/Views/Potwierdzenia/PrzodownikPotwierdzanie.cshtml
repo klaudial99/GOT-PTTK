@@ -1,0 +1,131 @@
+﻿
+@{
+    ViewData["Title"] = "Potwierdzenia";
+}<header>
+    <style>
+        .dowod {
+
+        }
+        .dowod2 {
+        }
+    </style>
+    </header>
+@if(ViewBag.Komunikat != null)
+{
+<h1>@ViewBag.Komunikat</h1>
+}
+
+<div id="potw_partial"></div>
+
+@section Scripts {
+
+    <script type="text/javascript">
+        function showHideRow(row) {
+            $("#" + row).toggle();
+        }
+
+
+
+    </script>
+    <script>
+
+        $(document).on("click", " .dowod2", function () {
+            $('#imagepreview2').attr('src', $(this).find("img").attr('src')); // here asign the image to the modal when the user click the enlarge link
+            $('#imagemodal2').modal('show'); // imagemodal is the id attribute assigned to the bootstrap modal, then i use the show function
+        });
+
+        $(document).on("click", " .dowod", function () {
+            $('#imagepreview').attr('src', $(this).find("img").attr('src')); // here asign the image to the modal when the user click the enlarge link
+            $('#imagemodal').modal('show'); // imagemodal is the id attribute assigned to the bootstrap modal, then i use the show function
+        });
+
+    </script>
+    <script>
+    var clicked_id;
+    function set_id(id) {
+        clicked_id = id;
+    }
+
+    $(document).on('shown.bs.modal', '#trip-modal', function load_details() {
+
+        $.ajax({
+            type: "get",
+            url: "/Wycieczka/SzczegolyWycieczki",
+            data: {id: clicked_id}
+        }).done(function (partialViewResult) {
+            $("#modal_body_details").html(partialViewResult);
+
+        });
+    });
+        var potwierdzono = false;
+        function pokaz_potwierdzono() {
+            if (potwierdzono)
+                $('#potw_frag').show()
+        };
+
+        $(function () {
+            $.ajax({
+                type: "get",
+                url: "/Potwierdzenia/DoPotwierdzenia"
+            })
+                .done(function (partialViewResult) {
+                    $("#potw_partial").html(partialViewResult);
+                    
+                });
+        });
+
+        function filtruj(filter) {
+            $.ajax({
+                type: "get",
+                url: "/Potwierdzenia/DoPotwierdzenia",
+                data: {which:filter}
+            })
+                .done(function (partialViewResult) {
+                    $("#potw_partial").html(partialViewResult);
+
+                });
+        };
+
+        function confirm_boxes() {
+            var checked = [];
+            $('input.check-box:checkbox:checked').each(function () {
+
+                checked.push(this.id);
+
+            });
+            return checked;
+        };
+
+
+        function send_confirmed() {
+            var values = confirm_boxes();
+            $.ajax({
+                type: "get",
+                url: "/Potwierdzenia/Potwierdz",
+                traditional: true,
+                data: { fragmenty_id: values }
+            }).done(function (partialViewResult) {
+
+                $("#potw_partial").html(partialViewResult);
+            });
+        };
+
+        function send_rejected() {
+            var values = confirm_boxes();
+            var reason = $('#reason').val();
+            $.ajax({
+                type: "get",
+                url: "/Potwierdzenia/Odrzuc",
+                traditional: true,
+                data: { fragmenty_id: values, powod: reason }
+            }).done(function (partialViewResult) {
+
+                $("#potw_partial").html(partialViewResult);
+
+                $('.modal-backdrop').remove();
+            });
+        };
+
+
+    </script>
+}

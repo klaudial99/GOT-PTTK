@@ -1,0 +1,135 @@
+﻿@model Got_PTTK_PO.ViewModels.TrasaWycieczkaVM;
+
+@{
+    var counter = 0;
+    var ostatni = "";
+    if (ViewBag.Fragmenty.Count > 0)
+        ostatni = ((ViewBag.Fragmenty as List<FragmentWycieczki>)[ViewBag.Fragmenty.Count - 1]).NazwaPK;
+}
+
+<div class="container bg-radius">
+    <div class="row m-1 pt-1">
+        <p class="modal-title">TWORZENIE NOWEJ WYCIECZKI</p>
+    </div>
+    <input id="ostatni" hidden value="@ostatni" />
+    <table class="table trip">
+        <thead>
+            <tr>
+                <th class="text-left my-th">DATA ROZPOCZĘCIA</th>
+                <th class="text-left">PUNKT POCZĄTKOWY</th>
+                <th class="text-left">PUNKT KOŃCOWY</th>
+                <th class="text-left">NAZWA TRASY</th>
+                <th class="text-right">LICZBA PUNKTÓW</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewBag.Fragmenty as IEnumerable<FragmentWycieczki>)
+            {
+                <tr>
+                    <td class="text-left">@item.Data.ToString("dd.MM.yyyy")</td>
+                    <td class="text-left">@item.NazwaPP</td>
+                    <td class="text-left">@item.NazwaPK</td>
+                    <td class="text-left">@item.NazwaT</td>
+                    <td class="text-right">@ViewBag.Punkty[item]</td>
+                    @if (++counter == ViewBag.Fragmenty.Count)
+                    {
+                        <td class="text-center">
+                            <button class="btn btn-danger btn-sm" type="button" onclick="remove_last()"> X </button>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="row">
+        <div class="col-2">
+            <span class="sum float-right">Suma punktów:</span>
+        </div>
+        <div class="col-1">
+            <span class="points-white-bg float-right">@ViewBag.Suma</span>
+        </div>
+        <div class="col">
+            <button type="button" class="btn my-add-btn-pink float-right" data-toggle="modal" data-target="#add-modal">NOWA TRASA</button>
+        </div>
+
+    </div>
+
+    <div class="row justify-content-end">
+        <button type="submit" class="btn my-bt-accept float-right"><i class="far fa-check-circle fa-3x"></i></button>
+    </div>
+
+    <div class="modal fade" id="add-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container modal-bg">
+                        <div class="row justify-content-between m-1">
+                            <p class="modal-title">TWORZENIE NOWEGO FRAGMENTU WYCIECZKI</p>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <form asp-action="DodajFragment">
+                            <div class="form-row">
+                                <div class="form-group col-6">
+                                    <label class="control-label" asp-for="NazwaPP">PUNKT POCZĄTKOWY</label>
+                                    <select id="NazwaPP" asp-for="NazwaPP" class="form-control" onfocus='this.size=5;' onblur='this.size=1;' onchange='this.size = 1; this.blur(); zmianaPP();' asp-items=@(ViewData["NazwaPP"] as SelectList)>
+                                    </select>
+                                </div>
+                                <div class="form-group col-6">
+                                    <label class="control-label" asp-for="NazwaPK">PUNKT KOŃCOWY</label>
+                                    <select id="NazwaPK" asp-for="NazwaPK" class="form-control" onfocus='this.size=5;' onblur='this.size=1;' onchange='this.size = 1; this.blur(); zmianaPK();' asp-items=@(new SelectList(string.Empty, "NazwaP","NazwaP"))>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-6">
+                                    <label class="control-label" asp-for="NazwaT">NAZWA TRASY</label>
+                                    <select id="NazwaT" asp-for="NazwaT" class="form-control" onfocus='this.size=5; zmianaPK()' onblur='this.size=1;' onchange='this.size=1; this.blur();' asp-items=@(ViewData["NazwaT"] as SelectList)>
+                                    </select>
+                                </div>
+                                <div class="form-group col-6">
+                                    <label class="control-label" asp-for="Data" value="">DATA</label>
+                                    <input class="form-control" type="date" id="DataR" asp-for="Data">
+                                </div>
+
+                                <input class="form-check-input" asp-for="@Model.CzyZaliczony" type="hidden" value="false" />
+
+                            </div>
+                            <div class="form-row justify-content-end">
+                                <button type="button" onclick="dodaj_wycieczke(document.getElementById('DataR').value, document.getElementById('NazwaPP').value, document.getElementById('NazwaPK').value, document.getElementById('NazwaT').value)" class="btn btn-pink bottom-right-sm">ZATWIERDŹ</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @if (ViewBag.Wiadomosci?.Count > 0)
+    {
+        foreach (var wiadomosc in ViewBag.Wiadomosci)
+        {
+            <div class="alert alert-nonactive alert-dismissible fade show" role="alert">
+                <div style="font-weight:600">@wiadomosc</div>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+    }
+    @if (ViewBag.Wylaczona != null && ViewBag.Wylaczona == true)
+    {
+        <div class="alert alert-nonactive alert-dismissible fade show" role="alert">
+            WYBRANA TRASA BYŁA W TYM TERMINIE NIEAKTYWNA!
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+</div>
+

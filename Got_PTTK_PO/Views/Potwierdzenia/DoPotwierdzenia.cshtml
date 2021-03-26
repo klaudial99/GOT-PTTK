@@ -1,0 +1,300 @@
+﻿
+@{
+    ViewData["Title"] = "Potwierdzenia";
+
+}
+<header>
+    <style>
+        #table_detail {
+        }
+
+
+            #table_detail .hidden_row {
+                display: none;
+            }
+    </style>
+</header>
+@if (ViewBag.Komunikat != null)
+{
+    <h2>@ViewBag.Komunikat</h2>
+}
+else
+{
+<div class="container-fluid pt-3">
+    <div class="row">
+        <div class="dropdown col-1">
+            <a href="" class="dropdown-toggle m-3 text-white" id="filter" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                FILTRUJ
+            </a>
+            <div class="dropdown-menu" aria-labelledby="filter">
+                <a class="dropdown-item" onclick='filtruj("my")' href="#">DO MNIE</a>
+                <a class="dropdown-item" onclick='filtruj("anybodys")' href="#">OGÓLNE</a>
+                <a class="dropdown-item" onclick='filtruj("all")' href="#">WSZYSTKIE</a>
+            </div>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="text-left">IMIĘ</th>
+                <th class="text-left">NAZWISKO</th>
+                <th class="text-left">DATA URODZENIA</th>
+                <th class="text-left">MIASTO</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var turysta in ViewBag.Paczka)
+            {
+                <tr href="#" onclick="showHideRow('hidden_@turysta.Key.IdUz');">
+                    <td class="text-left">@turysta.Key.Imie</td>
+                    <td class="text-left">@turysta.Key.Nazwisko</td>
+                    <td class="text-left">@turysta.Key.DataUrodzenia.ToString("dd.MM.yyyy")</td>
+                    <td class="text-left">WROCŁAW</td>
+                </tr>
+                <tr id="hidden_@(turysta.Key.IdUz)" class="hidden_row" style="display:none">
+
+                    <td colspan="4">
+                        <table class="table table-sm subtable" id="table_detail">
+                            <thead>
+                                <tr>
+                                    <th class="text-left">DATA</th>
+                                    <th class="text-left">PUNKT POCZĄTKOWY</th>
+                                    <th class="text-left">PUNKT KOŃCOWY</th>
+                                    <th class="text-left">TRASA</th>
+                                    <th class="text-right">LICZBA PUNKTÓW</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (var fragment in (turysta as IGrouping<Turysta, FragmentWycieczki>))
+                                {
+                                    <tr><td style="color:white" hidden>Wycieczka: @fragment.IdW</td></tr>
+                                    <tr>
+                                        <td class="text-left">@fragment.Data.ToString("dd.MM.yyyy")</td>
+                                        <td class="text-left">@fragment.NazwaPP</td>
+                                        <td class="text-left">@fragment.NazwaPK</td>
+                                        <td class="text-left">@fragment.NazwaT</td>
+                                        <td class="text-right">2</td>
+                                        <td class="text-center">
+                                            <input class="check-box" type="checkbox" id="@(fragment.IdW)_@(fragment.NumerFW)">
+                                        </td>
+
+
+                                        <td class="text-right">
+                                            <button type="button" class="btn-sm btn-info" data-toggle="modal" data-target="#trip-modal" onclick="set_id(@fragment.IdW)">WYCIECZKA</button>
+                                        </td>
+                                    </tr>
+                                    if (@fragment.ZdjecieDowod != "" && @fragment.ZdjecieDowod != null)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <a href="#" class="dowod">
+                                                    <img src="@( "~/evidence/"+fragment.ZdjecieDowod)" asp-append-version="true" width="50" height="50" />
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+
+                                }
+
+
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+
+    <div class="row justify-content-end">
+        <div class="col-2">
+            <button type="button" class="btn-sm btn-reject" data-toggle="modal" data-target="#reject-modal">ODRZUĆ ZAZNACZONE</button>
+        </div>
+        <div class="col-3">
+            <button type="button" class="btn-sm btn-accept" onclick="send_confirmed()">POTWIERDŹ ZAZNACZONE</button>
+        </div>
+    </div>
+
+
+
+    @*MODAL WYCIECZKA*@
+
+    <div class="modal fade" id="trip-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row justify-content-between m-1">
+                            <p class="modal-title">SZCZEGÓŁY WYCIECZKI</p>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+
+                        <div id="modal_body_details"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="row subtable">
+        <div class="col-3">
+            <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img src="" id="imagepreview" style="max-width:700px; height:auto">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="reject-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container modal-bg">
+                        <div class="row justify-content-between m-1">
+                            <p class="modal-title">UZASADNIENIE DECYZJI</p>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <form>
+                            <div class="form-row">
+                                <div class="form-group col">
+                                    <label class="control-label" for="NazwaP">DODAJ KOMENTARZ DO SWOJEJ DECYZJI</label>
+                                    <textarea class="form-control" id="reason" rows="5"></textarea>
+                                </div>
+
+
+                            </div>
+                            <div class="form-row justify-content-around">
+                                <div class="col-5">
+                                    <button type="button" class="btn-sm btn-reject float-right">ANULUJ</button>
+                                </div>
+                                <div class="col-5">
+                                    <button type="button" onclick="send_rejected()" class="btn-sm btn-accept float-left">WYŚLIJ</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (@ViewBag.Potwierdzono != null && @ViewBag.Potwierdzono.Equals("1"))
+    {
+        <div id="potw_frag" class="alert alert-fragments alert-dismissible fade show" role="alert">
+            Pomyślnie potwierdzono zaznaczony/e fragment/y
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    @if (@ViewBag.Odrzucono != null && @ViewBag.Odrzucono.Equals("1"))
+    {
+        <div id="odrz_frag" class="alert alert-fragments alert-dismissible fade show" role="alert">
+            Pomyślnie odrzucono zaznaczony fragment
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+    @if (@ViewBag.Brak != null && @ViewBag.Brak.Equals("1"))
+    {
+        <div id="odrz_frag" class="alert alert-fragments alert-dismissible fade show" role="alert">
+            Nie zaznaczono żadnych fragmentów!
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+
+</div>
+}
+
+
+
+@section Scripts {
+
+
+
+    <script type="text/javascript">
+        function showHideRow(row) {
+            $("#" + row).toggle();
+        }
+
+
+
+    </script>
+    <script>
+
+        //$(document).on("click", " .dowod", function () {
+        //    $('#imagepreview').attr('src', $(this).find("img").attr('src')); // here asign the image to the modal when the user click the enlarge link
+        //    $('#imagemodal').modal('show'); // imagemodal is the id attribute assigned to the bootstrap modal, then i use the show function
+        //});
+
+    </script>
+    <script>
+        var clicked_id;
+        function set_id(id) {
+            clicked_id = id;
+        }
+
+        $(document).on('shown.bs.modal', '#trip-modal', function load_details() {
+
+            $.ajax({
+                type: "get",
+                url: "/Wycieczkas/SzczegolyWycieczki",
+                data: { id: clicked_id }
+            }).done(function (partialViewResult) {
+                $("#modal_body_details").html(partialViewResult);
+
+            });
+        });
+        function confirm_boxes() {
+            var checked = [];
+            $('input.check-box:checkbox:checked').each(function () {
+
+                checked.push(this.id);
+
+            });
+            return checked;
+        }
+
+
+
+
+        //$(document).on('shown.bs.modal',"#trips-modal" , function load_details() {
+        //    alert(clicked_id)
+        //    $.ajax({
+        //        type: "get",
+        //        url: "/Wycieczkas/SzczegolyWycieczki",
+        //        data: { id: clicked_id }
+        //    }).done(function (partialViewResult) {
+        //        $("#modal_body_details").html(partialViewResult);
+
+        //    });
+        //});
+
+    </script>
+}

@@ -1,0 +1,394 @@
+﻿@model Got_PTTK_PO.ViewModels.DodajPunktViewModel
+
+@{
+    ViewData["Title"] = "Punkty";
+    //Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+
+
+<div class="container-fluid pt-3">
+    <div class="row">
+        <div class="dropdown col-1">
+            <a href="" class="dropdown-toggle m-3 text-white" id="sorting" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                SORTUJ WG
+            </a>
+            <div class="dropdown-menu" aria-labelledby="sorting">
+                <a class="dropdown-item" href="#">NAZWA A-Z</a>
+                <a class="dropdown-item" href="#">NAZWA Z-A</a>
+                <a class="dropdown-item" href="#">WYSOKOŚĆ N.P.M (ROSNĄCO)</a>
+            </div>
+        </div>
+        <div class="col-1">
+            <a href="" class="m-3 text-white" data-toggle="modal" data-target="#filter-modal">
+                FILTRUJ
+            </a>
+        </div>
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="col">
+                <button asp-action="DodajPunkt" type="button" class="btn-lg my-add-btn float-right" data-toggle="modal" data-target="#add-modal"><i class="fa fa-plus"></i>DODAJ NOWY PUNKT</button>
+            </div>
+        }
+        <!-- END Przycisk uruchamiający modal -->
+
+        <div class="modal fade" id="filter-modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="container modal-bg">
+                            <div class="row justify-content-between m-1">
+                                <p class="modal-title">WYSZUKIWANIE PUNKTÓW</p>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <form>
+                                <div class="form-row">
+                                    <div class="form-group col-6">
+                                        <label class="control-label" asp-for="NazwaP">NAZWA</label>
+                                        <input id="NazwaPFilter" type="text" class="form-control" asp-for="NazwaP">
+                                        <span asp-validation-for="NazwaP" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <label class="control-label" asp-for="Rodzaj">RODZAJ PUNKTU</label>
+                                        <select id="RodzajFilter" asp-for="Rodzaj" asp-items="Html.GetEnumSelectList<Rodzaj_Punktu>()" class="form-control">
+                                            <option selected value="">---</option>
+                                        </select>
+                                        <span asp-validation-for="Rodzaj" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-6">
+                                        <label class="control-label" asp-for="WysNpm">WYSOKOŚĆ N.P.M. OD</label>
+                                        <input id="WysNpmOdFilter" type="text" class="form-control" asp-for="WysNpm">
+                                        <span asp-validation-for="WysNpm" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <label class="control-label" asp-for="WysNpm">WYSOKOŚĆ N.P.M. DO</label>
+                                        <input id="WysNpmDoFilter" type="text" class="form-control" asp-for="WysNpm">
+                                        <span asp-validation-for="WysNpm" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-6">
+                                        <label class="control-label" asp-for="@Model.TerenyGorskie">TERENY GÓRSKIE</label>
+                                        <select id="TerenyFilter" multiple asp-for="@Model.TerenyGorskie" asp-items="@ViewData["NazwaTG"] as SelectList" class="form-control">
+                                            <option selected value="">---</option>
+                                        </select>
+                                        <span asp-validation-for="SzerGeo" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <label class="control-label" asp-for="@Model.RegionyGorskie">REGIONY GÓRSKIE</label>
+                                        <select id="RegionyFilter" multiple asp-for="@Model.RegionyGorskie" asp-items="@ViewData["IdRG"] as SelectList" class="form-control">
+                                            <option selected value="">---</option>
+                                        </select>
+                                        <span asp-validation-for="SzerGeo" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-row justify-content-end">
+                                    <button type="button" onclick="filter_points(document.getElementById('NazwaPFilter').value, document.getElementById('RodzajFilter').options[document.getElementById('RodzajFilter').selectedIndex].text, document.getElementById('WysNpmOdFilter').value, document.getElementById('WysNpmDoFilter').value, 'TerenyFilter', 'RegionyFilter')" class="btn btn-pink bottom-right">SZUKAJ</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (ViewBag.Dodano != null && ViewBag.Dodano == "1")
+    {
+<div id="potw_frag" class="alert alert-fragments alert-dismissible fade show" role="alert">
+    @ViewBag.Wiadomosc
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+    }
+    @if (ViewBag.Dodano != null && ViewBag.Dodano == "-1")
+    {
+        <div id="potw_frag" class="alert alert-fragments alert-dismissible fade show" role="alert">
+            @ViewBag.Wiadomosc
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+    <div class="col">
+        <div class="row">
+            <table class="table">
+                <thead>
+                    <tr>
+
+                        <th class="text-left my-th">NAZWA</th>
+                        <th class="text-left">TEREN GÓRSKI</th>
+                        <th class="text-left">REGION GÓRSKI</th>
+                        <th class="text-left">RODZAJ</th>
+                        <th class="text-right">WYSOKOŚĆ N.P.M.</th>
+                        <th class="text-right">SZEROKOŚĆ GEO.</th>
+                        <th class="text-right">DŁUGOŚĆ GEO.</th>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <th></th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ViewBag.Punkty as IEnumerable<Punkt>)
+                    {
+                        <tr>
+                            <td class="text-left">
+                                <a id="@(item.NazwaP)_NazwaP">@item.NazwaP</a>
+                            </td>
+                            <td class="text-left" id="@(item.NazwaP)_NazwaTG">
+                                @foreach (var teren in (ViewData["Tereny"] as Dictionary<string, List<TerenGorski>>)[item.NazwaP])
+                                {<a>@(teren.NazwaTG),</a>}
+                            </td>
+                            <td class="text-left" id="@(item.NazwaP)_IdRG">
+                                @foreach (var teren in (ViewData["Regiony"] as Dictionary<string, List<RegionGorski>>)[item.NazwaP])
+                                {<a>@(teren.IdRG),</a>}
+                            </td>
+                            <td class="text-left">
+                                <a id="@(item.NazwaP)_Rodzaj">@item.Rodzaj<a />
+                            </td>
+                            <td class="text-right">
+                                <a id="@(item.NazwaP)_WysNpm">@item.WysNpm<a />
+                            </td>
+                            <td class="text-right">
+                                <a id="@(item.NazwaP)_SzerGeo">@item.SzerGeo<a />
+                            </td>
+                            <td class="text-right">
+                                <a id="@(item.NazwaP)_DlGeo">@item.DlGeo<a />
+                            </td>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <td class="text-right">
+                                    <a href="#" type="button" class="btn-sm btn-info" data-id="@item.NazwaP" data-toggle="modal" data-target="#edit-modal">Edytuj</a>
+                                    
+                                    <a type="button" class="btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.NazwaP"> Usuń </a>
+
+                                </td>
+                            }
+
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+
+    </div>
+
+
+
+    <div class="modal fade" id="add-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container modal-bg">
+                        <div class="row justify-content-between m-1">
+                            <p class="modal-title">TWORZENIE NOWEGO PUNKTU</p>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <form asp-action="DodajPunkt">
+                            <div class="form-row">
+                                <div class="form-group col-4">
+                                    <label class="control-label" asp-for="NazwaP">NAZWA</label>
+                                    <input type="text" class="form-control" asp-for="NazwaP">
+                                    <span asp-validation-for="NazwaP" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-4">
+                                    <label class="control-label" asp-for="WysNpm">WYSOKOŚĆ N.P.M.</label>
+                                    <input type="text" class="form-control" asp-for="WysNpm">
+                                    <span asp-validation-for="WysNpm" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-4">
+                                    <label class="control-label" asp-for="Rodzaj">RODZAJ PUNKTU</label>
+                                    <select asp-for="Rodzaj" asp-items="Html.GetEnumSelectList<Rodzaj_Punktu>()" class="form-control">
+                                        <option selected value="">---</option>
+                                    </select>
+                                    <span asp-validation-for="Rodzaj" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-3">
+                                    <label class="control-label" asp-for="@Model.TerenyGorskie">TERENY GÓRSKIE</label>
+                                    <select multiple asp-for="@Model.TerenyGorskie" asp-items="@ViewData["NazwaTG"] as SelectList" class="form-control">
+                                        <option selected value="">---</option>
+                                    </select>
+                                    <span asp-validation-for="TerenyGorskie" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-3">
+                                    <label class="control-label" asp-for="@Model.RegionyGorskie">REGIONY GÓRSKIE</label>
+                                    <select multiple asp-for="@Model.RegionyGorskie" asp-items="@ViewData["IdRG"] as SelectList" class="form-control">
+                                        <option selected value="">---</option>
+                                    </select>
+                                    <span asp-validation-for="RegionyGorskie" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-3">
+                                    <label class="control-label" asp-for="SzerGeo">SZEROKOŚĆ GEO.</label>
+                                    <input type="text" class="form-control" asp-for="SzerGeo">
+                                    <span asp-validation-for="SzerGeo" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-3">
+                                    <label class="control-label" asp-for="DlGeo">DŁUGOŚĆ GEO.</label>
+                                    <input type="text" class="form-control" asp-for="DlGeo">
+                                    <span asp-validation-for="DlGeo" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-row justify-content-end">
+                                <button type="submit" class="btn btn-pink ">ZATWIERDŹ</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="edit-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container modal-bg">
+                        <div class="row justify-content-between m-1">
+                            <p class="modal-title">EDYTOWANIE PUNKTU</p>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <form asp-action="Edit">
+                            @Html.Hidden("id", "", new { @class = "hiddenid" })
+                            <div class="form-row">
+                                <div class="form-group col-4">
+                                    <label class="control-label" asp-for="NazwaP">NAZWA</label>
+                                    <input id="NazwaPid" type="text" class="form-control" readonly="readonly" asp-for="NazwaP">
+                                </div>
+                                <div class="form-group col-4">
+                                    <label class="control-label" asp-for="WysNpm">WYSOKOŚĆ N.P.M.</label>
+                                    <input id="WysNpmid" type="text" class="form-control" asp-for="WysNpm">
+                                    <span asp-validation-for="WysNpm" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-4">
+                                    <label class="control-label" asp-for="Rodzaj">RODZAJ PUNKTU</label>
+                                    <select id="Rodzajid" asp-for="Rodzaj" asp-items="Html.GetEnumSelectList<Rodzaj_Punktu>()" class="form-control">
+                                        <option selected value="">---</option>
+                                    </select>
+                                    <span asp-validation-for="Rodzaj" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-3">
+                                    <label class="control-label" asp-for="@Model.TerenyGorskie">TERENY GÓRSKIE</label>
+                                    <select id="Terenyid" multiple asp-for="@Model.TerenyGorskie" asp-items="@ViewData["NazwaTG"] as SelectList" class="form-control">
+                                    </select>
+                                    <span asp-validation-for="@Model.TerenyGorskie" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-3">
+                                    <label class="control-label" asp-for="@Model.RegionyGorskie">REGIONY GÓRSKIE</label>
+                                    <select id="Regionyid" multiple asp-for="@Model.RegionyGorskie" asp-items="@ViewData["IdRG"] as SelectList" class="form-control">
+                                    </select>
+                                    <span asp-validation-for="@Model.RegionyGorskie" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-3">
+                                    <label class="control-label" asp-for="SzerGeo">SZEROKOŚĆ GEO.</label>
+                                    <input id="SzerGeoid" type="text" class="form-control" asp-for="SzerGeo">
+                                    <span asp-validation-for="SzerGeo" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-3">
+                                    <label class="control-label" asp-for="DlGeo">DŁUGOŚĆ GEO.</label>
+                                    <input id="DlGeoid" type="text" class="form-control" asp-for="DlGeo">
+                                    <span asp-validation-for="DlGeo" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-row justify-content-end">
+                                <button type="submit" class="btn btn-pink">ZATWIERDŹ</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.5.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var arr = new Array();
+            $("select[multiple]").change(function () {
+                if (this.id != "TerenyFilter" && this.id != "RegionyFilter") {
+                    $(this).find("option:selected")
+                    if ($(this).find("option:selected").length > 2) {
+                        $(this).find("option").removeAttr("selected");
+                        $(this).val(arr);
+                    }
+                    else {
+                        arr = new Array();
+                        $(this).find("option:selected").each(function (index, item) {
+                            arr.push($(item).val());
+                        });
+                    }
+                }
+                
+            });
+        });
+        
+        @*function filtered(nazwa, rodzaj, wys_od, wys_do, ter, reg) {
+            var regs = $('#RegionyFilter').val();
+            var ters = $('#TerenyFilter').val();
+            $.post('@Url.Action("Filter", "Punkts")', new { nazwa: nazwa, rodzaj: rodzaj, wys_od: wys_od, wys_do: wys_do, ter: ters, reg: regs });
+        };*@
+
+        function filter_points(nazwa, rodzaj, wys_od, wys_do, ter, reg) {
+            var regs = $('#RegionyFilter').val();
+            var ters = $('#TerenyFilter').val();
+            $.ajax({
+                type: "post",
+                url: "/Punkts/Filter",
+                data: { nazwa: nazwa, rodzaj: rodzaj, wys_od: wys_od, wys_do: wys_do, ter: ters, reg: regs}
+            }).done(function (result) {
+                document.open();
+                document.write(result);
+                document.close();
+            });
+        };
+
+        $('#edit-modal').on('shown.bs.modal', function (e) {
+            //get data-id attribute of the clicked element
+            var editId = $(e.relatedTarget).data('id');
+            var nazwa = document.getElementById(editId + "_NazwaP");
+            var wys = document.getElementById(editId + "_WysNpm");
+            var rodz = document.getElementById(editId + "_Rodzaj");
+            var szer = document.getElementById(editId + "_SzerGeo");
+            var dl = document.getElementById(editId + "_DlGeo");
+            var regiony = document.getElementById(editId + "_IdRG").innerHTML.replaceAll('<a>', '').replaceAll('</a>', '').split(',').map(x => x.replace(/\n/g, ""));
+            var tereny = document.getElementById(editId + "_NazwaTG").innerHTML.replaceAll('<a>', '').replaceAll('</a>', '').split(',').map(x => x.replace(/\n/g, ""));
+            $("#NazwaPid").val(nazwa.innerHTML);
+            $("#WysNpmid").val(wys.innerHTML);
+            $("#Rodzajid option:contains("+rodz.innerHTML+")").each(function () {
+                if ($(this).text() == rodz.innerHTML) {
+                    $(this).attr('selected', 'selected');
+                }
+            });
+            //$("#Regionyid").val("KAOSD").change();
+            $("#Regionyid").val(regiony);
+            $("#Terenyid").val(tereny);
+            $("#SzerGeoid").val(szer.innerHTML);
+            $("#DlGeoid").val(dl.innerHTML);
+            $(".modal-body .hiddenid").val(editId);
+            //populate the textbox
+            //$(e.currentTarget).find('input[name="bookId"]').val(bookId);
+        });
+    </script>
+
+}

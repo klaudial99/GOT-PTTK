@@ -1,0 +1,313 @@
+﻿@model IEnumerable<Got_PTTK_PO.Models.Wycieczka>
+
+@{
+    ViewData["Title"] = "Trips";
+}
+@if (!User.IsInRole("Admin"))
+{
+    <span style="color:#4B4B4B; font-size:48px; font-weight:500; margin-left:20px">
+        Twoje wycieczki
+    </span>
+}
+else
+{
+    <span style="color:#4B4B4B; font-size:48px; font-weight:500; margin-left:20px">
+        Wszystkie wycieczki
+    </span>
+}
+<div class="container-fluid pt-3">
+    <div class="row">
+        <div class="dropdown col-2">
+            <a href="" class="dropdown-toggle m-3 text-white" id="sorting" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                SORTUJ WG
+            </a>
+            <div class="dropdown-menu dropdown-scroll" aria-labelledby="sorting">
+                <a class="dropdown-item" href="#">NAZWA A-Z</a>
+                <a class="dropdown-item" href="#">NAZWA Z-A</a>
+                <a class="dropdown-item" href="#">WYSOKOŚĆ N.P.M (ROSNĄCO)</a>
+            </div>
+        </div>
+        <div class="col-2">
+            <a href="" class="m-3 text-white" data-toggle="modal" data-target="#filter-modal">
+                FILTRUJ
+            </a>
+        </div>
+
+        <div class="modal fade" id="filter-modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="container modal-bg">
+                            <div class="row justify-content-between m-1">
+                                <p class="modal-title">WYSZUKIWANIE WYCIECZEK</p>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <form>
+                                <div class="form-row">
+                                    <div class="form-group col-6">
+                                        <label class="control-label" for="example-date-input">DATA OD</label>
+                                        <input class="form-control" type="date" id="DataOdFilter">
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <label class="control-label" for="example-date-input">DATA DO</label>
+                                        <input class="form-control" type="date" id="DataDoFilter">
+                                    </div>
+
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-6">
+                                        <label class="control-label" for="ModelTerenyGorskie">LICZBA PUNKTÓW OD</label>
+                                        <input type="text" class="form-control" id="LiczbaPktOdFilter">
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <label class="control-label" for="ModelTerenyGorskie">LICZBA PUNKTÓW DO</label>
+                                        <input type="text" class="form-control" id="LiczbaPktDoFilter">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-6">
+                                        <label class="control-label" for="WysNpm">OBSZAR GÓRSKI</label>
+                                        <select id="ObszaryFilter" class="form-control" multiple>
+                                            <option selected value="">---</option>
+                                            <option>SUDETY</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <label class="control-label" for="Rodzaj">ODZNAKA</label>
+                                        <select id="OdznakaFilter" class="form-control" onfocus='this.size=5;' onblur='this.size=1;' onchange='this.size=1; this.blur();'>
+                                            <option selected value="">---</option>
+                                            <option>POPULARNA</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row justify-content-between">
+                                    <div class="form-group col-3">
+                                        <div class="form-check bottom-right-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="ZatwierdzonaFilter" checked="checked">
+                                            <label class="form-check-label" for="pierwszyCheckbox">
+                                                ZATWIERDZONA
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-3">
+                                        <div class="form-check bottom-right-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="NiezatwierdzonaFilter" checked="checked">
+                                            <label class="form-check-label" for="pierwszyCheckbox">
+                                                NIEZATWIERDZONA
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-3">
+                                        <button type="button" onclick="filtruj_wycieczki()" class="btn btn-pink bottom-right">SZUKAJ</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <button type="button" id="dodaj_wycieczke" class="btn-lg my-add-btn float-right" onclick="pokaz_dodawanie_wycieczki()"><i class="fa fa-plus"></i>DODAJ NOWĄ WYCIECZKĘ</button>
+        </div>
+    </div>
+    @if (User.IsInRole("Turysta"))
+    {
+        <div class="row pt-2 justify-content-end">
+            <div class="col-2">
+
+                <span class="text-white sum float-right">Suma punktów:</span>
+            </div>
+            <div class="col-1">
+                <span class="points float-right">@ViewBag.SumaPunktow</span>
+            </div>
+
+
+        </div>
+    }
+
+
+
+
+
+    @if (@ViewBag.Usunieto != null)
+    {
+        <div id="odrz_frag" class="alert alert-fragments alert-dismissible fade show" role="alert">
+            @if (@ViewBag.Usunieto.Equals("1"))
+            {
+                @Html.Raw("Pomyślnie usunięto wycieczkę!")
+            }
+            else
+            {
+                @Html.Raw("Nie można usunąć potwierdzonej wycieczki!")
+            }
+
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+    <table class="table">
+        <thead>
+            <tr>
+
+                <th class="text-left my-th">DATA ROZPOCZĘCIA</th>
+                <th class="text-left">DATA ZAKOŃCZENIA</th>
+                <th class="text-left">OBSZAR GÓRSKI</th>
+                <th class="text-left">ODZNKA</th>
+                <th class="text-center">STATUS</th>
+                <th class="text-right">LICZBA PUNKTÓW</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td id="@item.IdW" class="text-left">
+                        @Html.DisplayFor(modelItem => item.DataRozp)
+                    </td>
+                    <td class="text-left">
+                        @Html.DisplayFor(modelItem => item.DataZak)
+                    </td>
+                    <td class="text-left">
+                        Sudety
+                    </td>
+                    <td class="text-left">
+                        Popularna
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(modelItem => item.CzyZaliczona)
+                    </td>
+                    <td class="text-right">
+                        @ViewBag.Punkty[item.IdW]
+                    </td>
+                    <td class="text-right">
+                        <button id="details_@item.IdW" type="button" onclick="set_id(@item.IdW)" class="btn-sm btn-info" data-toggle="modal" data-target="#trip-modal-user">Szczegóły</button>
+                        <button id="delete_@item.IdW" type="button" onclick="usun_wycieczke(@item.IdW)" class="btn-sm btn-info">Usuń</button>
+                        <button id="send_@item.IdW" type="button" onclick="set_id(@item.IdW)" class="btn-sm btn-send" data-toggle="modal" data-target="#przodownik-modal">Wyślij</button>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+    <div class="modal fade" id="trip-modal-user" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row justify-content-between m-1">
+                            <p class="modal-title">SZCZEGÓŁY WYCIECZKI</p>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div id="modal_body_details"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="evidence-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container modal-bg">
+                        <div class="row justify-content-between m-1">
+                            <p class="modal-title">DODAWANIE DOWODÓW</p>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <form id="dowod" asp-action="DodajDowod" method="post" enctype="multipart/form-data">
+
+                            @Html.Hidden("fragment_id", "", new { @class = "hiddenid" })
+                            @*<input name="IdW" value="@ViewBag.IdW" hidden />*@
+                            <div class="form-row justify-content-start">
+                                <div class="form-group col-12">
+                                    <label for="przykladoweWysylaniePliku">WYBIERZ ZDJĘCIE</label>
+                                    <input id="new_image" name="new_image" type="file" onchange="previewFile(event)" class="form-control-file">
+                                </div>
+                            </div>
+                            <div class="form-row justify-content-start">
+                                <img id="preview" style="max-width:700px; height:auto" />
+                            </div>
+                            <div class="form-row justify-content-end">
+                                <button type="submit" form="dowod" class="btn btn-pink bottom-right">PRZEŚLIJ</button>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="przodownik-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container modal-bg">
+                        <div class="row justify-content-between m-1">
+                            <p class="modal-title">WYBÓR OSOBY ZATWIERDZAJĄCEJ</p>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div id="modal_body_przodownik"></div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+
+
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.5.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        var clicked_id;
+        function set_id(id) {
+            clicked_id = id;
+        };
+
+        $(document).on('shown.bs.modal', '#trip-modal-user', function load_detailss() {
+            $.ajax({
+                type: "get",
+                url: "/Wycieczka/SzczegolyWycieczki",
+                data: { id: clicked_id }
+            }).done(function (partialViewResult) {
+                $("#modal_body_details").html(partialViewResult);
+
+            });
+        });
+
+
+        function filtruj_wycieczki() {
+
+            var zatwierdzona = $('#ZatwierdzonaFilter').is(':checked');
+            var niezatwierdzona = $('#NiezatwierdzonaFilter').is(':checked');
+            var pkt_od = document.getElementById("LiczbaPktOdFilter").value;
+            var pkt_do = document.getElementById("LiczbaPktDoFilter").value;
+            var data_od = document.getElementById("DataOdFilter").value;
+            var data_do = document.getElementById("DataDoFilter").value;
+            $.ajax({
+                type: "post",
+                url: "/Wycieczka/FiltrujWycieczki",
+                data: { zatwierdzona: zatwierdzona, niezatwierdzona: niezatwierdzona, pkt_od: pkt_od, pkt_do: pkt_do, data_od: data_od, data_do: data_do }
+            }).done(function (result) {
+                $("#articles_partial").html(result);
+            });
+        };
+    </script>
+
+
+}

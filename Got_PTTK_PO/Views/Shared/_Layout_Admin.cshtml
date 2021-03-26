@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="~/lib/font-awesome/css/all.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&display=swap" rel="stylesheet">
+    <link href="~/css/styles.css" rel="stylesheet" />
+
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="menu-bar">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#"><img src="~/uploads/logo.png"> </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Home">HOME</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">RANKINGI</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="/Home">TRASY I PUNKTY</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">KONTA UŻYTKOWNIKÓW</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Identity/Account/Manage"><i class="far fa-user fa-fw"></i>MOJE KONTO</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+        </div>
+    </div>
+
+
+    <div class="container-fluid mybg min-vh-100">
+
+        @RenderBody()
+
+    </div>
+
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    @RenderSection("Scripts", required: false)
+    <link href="~/lib/font-awesome/css/all.css" rel="stylesheet" />
+</body>
+</html>

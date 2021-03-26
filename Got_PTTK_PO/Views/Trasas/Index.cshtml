@@ -1,0 +1,293 @@
+﻿@model Got_PTTK_PO.ViewModels.TworzenieTrasyVM
+@{
+    ViewData["Title"] = "Routes";
+}
+<div class="container-fluid pt-3">
+    <div class="row">
+        <div class="dropdown col-1">
+            <a href="" class="dropdown-toggle m-3 text-white" id="sorting" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                SORTUJ WG
+            </a>
+            <div class="dropdown-menu" aria-labelledby="sorting">
+                <a class="dropdown-item" href="#">NAZWA A-Z</a>
+                <a class="dropdown-item" href="#">NAZWA Z-A</a>
+                <a class="dropdown-item" href="#">LICZBA PUNKTÓW (ROSNĄCO)</a>
+            </div>
+        </div>
+        <div class="col-1">
+            <a href="" class="m-3 text-white" data-toggle="modal" data-target="#filter-modal">
+                FILTRUJ
+            </a>
+        </div>
+        <div class="col">
+            <button type="button" class="btn-lg my-add-btn float-right" data-toggle="modal" data-target="#add-modal"><i class="fa fa-plus"></i>DODAJ NOWĄ TRASĘ</button>
+
+        </div>
+        <!-- END Przycisk uruchamiający modal -->
+
+        <div class="modal fade" id="filter-modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="container modal-bg">
+                            <div class="row justify-content-between m-1">
+                                <p class="modal-title">WYSZUKIWANIE TRAS</p>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <form asp-action="Create">
+                                <div class="form-row">
+                                    <div class="form-group col-6">
+                                        <label class="control-label" asp-for="NazwaT">NAZWA</label>
+                                        <input type="text" class="form-control" id="NazwaTFilter" asp-for="NazwaT">
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <div class="form-check bottom-right-check">
+                                            <input class="form-check-input" type="checkbox" id="CzyAktywnaFilter" asp-for="CzyAktywna" checked="checked">
+                                            <label class="form-check-label" asp-for="CzyAktywna">
+                                                AKTYWNA
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-6">
+                                        <label class="control-label" asp-for="LiczbaPkt">LICZBA PUNKTÓW OD</label>
+                                        <input type="text" asp-for="LiczbaPkt" class="form-control" id="LiczbaPktOdFilter" sp-for="LiczbaPkt">
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <label class="control-label" asp-for="LiczbaPkt">LICZBA PUNKTÓW DO</label>
+                                        <input type="text" asp-for="LiczbaPkt" class="form-control" id="LiczbaPktDoFilter" sp-for="LiczbaPkt">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-6">
+                                        <label class="control-label" asp-for="NazwaPP">PUNKTY POCZĄTKOWE</label>
+                                        <select id="NazwaPPFilter" class="form-control" multiple asp-for="NazwaPP" asp-items="@(ViewData["NazwaPP"] as SelectList)">
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <label class="control-label" asp-for="NazwaPK">PUNKTY KOŃCOWE</label>
+                                        <select id="NazwaPKFilter" class="form-control" multiple asp-for="NazwaPK" asp-items="@(ViewData["NazwaPK"] as SelectList)">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row justify-content-end">
+                                    <button type="button" onclick="filter_routes()" class="btn btn-pink bottom-right">SZUKAJ</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="text-left my-th">NAZWA</th>
+                <th class="text-left">PUNKT POCZĄTKOWY</th>
+                <th class="text-left">PUNKT KOŃCOWY</th>
+                <th class="text-left">REGION GÓRSKI</th>
+                <th class="text-center">CZY AKTYWNA</th>
+                <th class="text-right">LICZBA PUNKTÓW</th>
+
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewBag.Trasy as IEnumerable<Trasa>)
+            {
+                <tr>
+                    <td id="@((item.NazwaT + item.NazwaPP + item.NazwaPK).GetHashCode())_NazwaT" class="text-left">@item.NazwaT</td>
+                    <td id="@((item.NazwaT + item.NazwaPP + item.NazwaPK).GetHashCode())_PktPocz" class="text-left">@item.PunktPocz.NazwaP</td>
+                    <td id="@((item.NazwaT + item.NazwaPP + item.NazwaPK).GetHashCode())_PktKon" class="text-left">@item.PunktKonc.NazwaP</td>
+                    <td class="text-left">@(ViewBag.Regiony[item.NazwaT + item.NazwaPP + item.NazwaPK])</td>
+                    <td class="text-center">
+                        <input id="@((item.NazwaT + item.NazwaPP + item.NazwaPK).GetHashCode())_Aktywna" class="check-box" disabled type="checkbox" checked="@item.CzyAktywna">
+                    </td>
+
+                    <td id="@((item.NazwaT + item.NazwaPP + item.NazwaPK).GetHashCode())_Pkt" class="text-right">@item.LiczbaPkt.ToString()</td>
+                    <td class="text-right">
+                        <button href="#" class="btn-sm btn-info" data-id="@((item.NazwaT + item.NazwaPP + item.NazwaPK).GetHashCode())" data-toggle="modal" data-target="#edit-modal">Edytuj</button>
+                        <button type="button" class="btn-sm btn-danger">Usuń</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="modal fade" id="add-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container modal-bg">
+                        <div class="row justify-content-between m-1">
+                            <p class="modal-title">TWORZENIE NOWEJ TRASY</p>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <form asp-action="Create">
+                            <div class="form-row">
+                                <div class="form-group col-5">
+                                    <label class="control-label" asp-for="NazwaT">NAZWA</label>
+                                    <input type="text" class="form-control" id="NazwaT" asp-for="NazwaT">
+                                    <span asp-validation-for="NazwaT" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-5">
+                                    <label class="control-label" asp-for="LiczbaPkt">LICZBA PUNKTÓW</label>
+                                    <input type="text" asp-for="LiczbaPkt" class="form-control" id="LiczbaPkt" sp-for="LiczbaPkt">
+                                    <span asp-validation-for="LiczbaPkt" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-2">
+                                    <div class="form-check bottom-right-check">
+                                        <input class="form-check-input" type="checkbox" id="CzyAktywna" asp-for="CzyAktywna">
+                                        <label class="form-check-label" asp-for="CzyAktywna">
+                                            AKTYWNA
+                                        </label>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-5">
+                                    <label class="control-label" asp-for="NazwaPP">PUNKT POCZĄTKOWY</label>
+                                    <select id="NazwaPP" class="form-control" onfocus='this.size=7;' onblur='this.size=1;' onchange='this.size=1; this.blur();' asp-for="NazwaPP" asp-items="@(ViewData["NazwaPP"] as SelectList)">
+                                    </select>
+                                    <span asp-validation-for="NazwaPP" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-5">
+                                    <label class="control-label" asp-for="NazwaPK">PUNKT KOŃCOWY</label>
+                                    <select id="NazwaPK" class="form-control" onfocus='this.size=7;' onblur='this.size=1;' onchange='this.size=1; this.blur();' asp-for="NazwaPK" asp-items=@(new SelectList(string.Empty, "NazwaP","NazwaP"))>
+                                    </select>
+                                    <span asp-validation-for="NazwaPK" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-2">
+                                    <button type="submit" class="btn btn-pink float-right bottom-right">ZATWIERDŹ</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="edit-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="container modal-bg">
+                    <div class="row justify-content-between m-1">
+                        <p class="modal-title">EDYTOWANIE TRASY</p>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <form asp-action="Edit">
+                        @Html.Hidden("NazwaT", "", new { @class = "hiddenNazwaT" })
+                        @Html.Hidden("NazwaPP", "", new { @class = "hiddenNazwaPP" })
+                        @Html.Hidden("NazwaPK", "", new { @class = "hiddenNazwaPK" })
+                        <div class="form-row">
+                            <div class="form-group col-5">
+                                <label class="control-label" asp-for="NazwaT">NAZWA</label>
+                                <input type="text" class="form-control" id="NazwaTid" asp-for="NazwaT" disabled>
+                                <span asp-validation-for="NazwaT"/>
+                            </div>
+                            <div class="form-group col-5">
+                                <label class="control-label" asp-for="LiczbaPkt">LICZBA PUNKTÓW</label>
+                                <input type="text" asp-for="LiczbaPkt" class="form-control" disabled id="Pktid" sp-for="LiczbaPkt">
+                                <span asp-validation-for="LiczbaPkt" />
+                            </div>
+                            <div class="form-group col-2">
+                                <div class="form-check bottom-right-check">
+                                    <input class="form-check-input" type="checkbox" id="Aktywnaid" asp-for="CzyAktywna">
+                                    <label class="form-check-label" asp-for="CzyAktywna">
+                                        AKTYWNA
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-5">
+                                <label class="control-label" asp-for="NazwaPP">PUNKT POCZĄTKOWY</label>
+                                <input class="form-control" id="PktPoczid" asp-for="NazwaPP" disabled>
+                            </div>
+                            <div class="form-group col-5">
+                                <label class="control-label" asp-for="NazwaPK">PUNKT KOŃCOWY</label>
+                                <input class="form-control" id="PktKonid" asp-for="NazwaPK" disabled>
+                            </div>
+                            <div class="form-group col-2">
+                                <button type="submit" class="btn btn-pink float-right bottom-right">ZATWIERDŹ</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+
+    $('#NazwaPP').change(function () {
+        var url = '@Url.Content("~/")' + "Trasas/GetPoints";
+        var ddlsource = "#NazwaPP";
+        $.getJSON(url, { NazwaPP: $(ddlsource).val() }, function (data) {
+            var items = '';
+            $("#NazwaPK").empty();
+            $.each(data, function (i, koncowy) {
+                items += "<option value='" + koncowy.value + "'>" + koncowy.text + "</option>";
+            });
+            $('#NazwaPK').html(items);
+        });
+    });
+
+        function filter_routes() {
+            var nazwa = document.getElementById("NazwaTFilter").value;
+            var aktywna = $('#CzyAktywnaFilter').is(':checked');
+            var pkt_od = document.getElementById("LiczbaPktOdFilter").value;
+            var pkt_do = document.getElementById("LiczbaPktDoFilter").value;
+            var pkt_pocz = $('#NazwaPPFilter').val();
+            var pkt_kon = $('#NazwaPKFilter').val();
+        $.ajax({
+            type: "post",
+            url: "/Trasas/Filter", 
+            //string nazwa, bool aktywna, int pkt_od, int pkt_do, string[] pkt_pocz, string[] pkt_kon
+            data: { nazwa: nazwa, aktywna: aktywna, pkt_od: pkt_od, pkt_do: pkt_do, pkt_pocz: pkt_pocz, pkt_kon: pkt_kon }
+        }).done(function (result) {
+            document.open();
+            document.write(result);
+            document.close();
+        });
+    };
+
+    $('#edit-modal').on('shown.bs.modal', function (e) {
+        //get data-id attribute of the clicked element
+        var editId = $(e.relatedTarget).data('id');
+        var nazwa = document.getElementById(editId + "_NazwaT");
+        var aktywna = $("#" + editId + "_Aktywna").is(':checked');
+        var pkt = $("#" + editId + "_Pkt").text();
+        var trasa = document.getElementById(editId + "_NazwaT");
+        var pkt_pocz = document.getElementById(editId + "_PktPocz");
+        var pkt_kon = document.getElementById(editId + "_PktKon"); $("#NazwaTid").val(nazwa.innerHTML);
+        $("#Aktywnaid").prop("checked", aktywna);
+        $("#Pktid").val(pkt);
+        $("#PktPoczid").val(pkt_pocz.innerHTML);
+        $("#PktKonid").val(pkt_kon.innerHTML);
+        $(".modal-body .hiddenNazwaT").val(trasa.innerHTML);
+        $(".modal-body .hiddenNazwaPP").val(pkt_pocz.innerHTML);
+        $(".modal-body .hiddenNazwaPK").val(pkt_kon.innerHTML);
+
+    });
+    </script>
+}

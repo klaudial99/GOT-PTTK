@@ -1,0 +1,48 @@
+﻿@model Got_PTTK_PO.Models.Trasa
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Trasa</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.NazwaT)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NazwaT)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PunktPocz)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PunktPocz.NazwaP)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PunktKonc)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PunktKonc.NazwaP)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.LiczbaPkt)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.LiczbaPkt)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CzyAktywna)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CzyAktywna)
+        </dd>
+    </dl>
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    <a asp-action="Index">Back to List</a>
+</div>

@@ -1,0 +1,17 @@
+﻿
+@{
+}
+<form id="wys" asp-action="Wyslij" method="post">
+    <div class="form-row justify-content-between">
+        <div class="form-group col-6">
+            <input type="number" name="IdW" value="@ViewBag.IdW" hidden />
+            <label class="control-label" for="Rodzaj">EKSPERT</label>
+            <select id="Rodzaj" name="idP" class="form-control" onfocus='this.size=5;' onblur='this.size=1;' onchange='this.size=1; this.blur();' asp-items="@(ViewData["Przodownicy"] as List<SelectListItem>)">
+                <option selected value="DOWOLNY">DOWOLNY</option>
+            </select>
+        </div>
+        <div class="form-group col-3 justify-content-end">
+            <button type="submit" form="wys" class="btn btn-pink bottom-right">PRZEŚLIJ</button>
+        </div>
+    </div>
+</form>

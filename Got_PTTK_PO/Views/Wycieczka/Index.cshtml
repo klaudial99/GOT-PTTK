@@ -1,0 +1,242 @@
+﻿@model Got_PTTK_PO.ViewModels.TrasaWycieczkaVM;
+@{
+    ViewData["Title"] = "Index";
+    
+}
+<header>
+    <style>
+        .dowod {
+        }
+        .dowod2 {
+        }
+    </style>
+</header>
+
+<form asp-controller="Wycieczka" id="tworzenie_wycieczki" asp-action="DodajWycieczke">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <input asp-for="NumerK" class="form-control" type="hidden" value=@ViewBag.Ksiazeczka />
+
+
+    <input asp-for="DataRozp" class="form-control" type="hidden" value="23.01.2021 01:34:00" />
+    <input asp-for="DataZak" class="form-control" type="hidden" value="23.01.2021 01:35:00" />
+    <input class="form-check-input" asp-for="CzyZaliczona" type="hidden" value=false />
+    <div id="create_wycieczka"></div>
+
+</form>
+    <div id="articles_partial"></div> @*Dotychczasowe fragmenty*@
+
+<div class="row subtable">
+    <div class="col-3">
+        <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img src="" id="imagepreview" style="max-width:700px; height:auto">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script type="text/javascript">
+
+
+        var clicked_id;
+        var clicked_id_fw;
+    function set_id(id) {
+        clicked_id = id;
+        };
+        
+    function set_id_fw(id) {
+        clicked_id_fw = id;
+    };
+
+    $(document).on('shown.bs.modal', '#trip-modal-user', function load_detailss() {
+        $.ajax({
+            type: "get",
+            url: "/Wycieczka/SzczegolyWycieczki",
+            data: { id: clicked_id }
+        }).done(function (partialViewResult) {
+            $("#modal_body_details").html(partialViewResult);
+
+        });
+    });
+
+    $(document).on('shown.bs.modal', '#przodownik-modal', function load_details() {
+        $.ajax({
+            type: "get",
+            url: "/Wycieczka/OtworzOknoWyslania",
+            data: { id: clicked_id }
+        }).done(function (partialViewResult) {
+            $("#modal_body_przodownik").html(partialViewResult);
+
+        });
+    });
+
+    $(document).on('shown.bs.modal', '#evidence-modal', function () {
+        $(".modal-body .hiddenid").val(clicked_id_fw);
+    });
+
+    $(document).on('shown.bs.modal', '#add-modal', function () {
+
+        let today = new Date().toISOString().substr(0, 10);
+        document.querySelector('#DataR').value = today;
+        $('#NazwaPP').val($('#ostatni').val());
+        zmianaPP();
+        zmianaPK();
+    });
+
+    $(document).ready(function () {
+        var items = "<option value='0'>Select</option>";
+        $('#NazwaPK').html(items);
+    });
+
+    $(document).ready(function () {
+        var items = "<option value='0'>Select</option>";
+        $('#NazwaPK').html(items);
+    });
+
+    $(document).ready(function () {
+        var items = "<option value='0'>Select</option>";
+        $('#NazwaT').html(items);
+    });
+    //$('#NazwaPP').change
+    function zmianaPP() {
+        var url = '@Url.Content("~/")' + "Wycieczka/GetPoints";
+        var ddlsource = "#NazwaPP";
+        $.getJSON(url, { NazwaPP: $(ddlsource).val() }, function (data) {
+
+            var items = '';
+            $("#NazwaPK").empty();
+            $.each(data, function (i, koncowy) {
+                items += "<option value='" + koncowy.value + "'>" + koncowy.text + "</option>";
+            });
+            $('#NazwaPK').html(items);
+        });
+        $.getJSON('@Url.Content("~/")' + "Wycieczka/GetTrasas", { NazwaPP: $(ddlsource).val(), NazwaPK: $('#NazwaPK').val() }, function (data) {
+            var items = '';
+            $("#NazwaT").empty();
+            $.each(data, function (i, koncowy) {
+                items += "<option value='" + koncowy.value + "'>" + koncowy.text + "</option>";
+            });
+            $('#NazwaT').html(items);
+        });
+    };
+
+
+    function zmianaPK() {
+        var url = '@Url.Content("~/")' + "Wycieczka/GetTrasas";
+        var ddlsource = "#NazwaPK";
+        $.getJSON(url, { NazwaPP: $("#NazwaPP").val(), NazwaPK: $(ddlsource).val() }, function (data) {
+            var items = '';
+            $("#NazwaT").empty();
+            $.each(data, function (i, koncowy) {
+                items += "<option value='" + koncowy.value + "'>" + koncowy.text + "</option>";
+            });
+            $('#NazwaT').html(items);
+        });
+
+    };
+
+    $(function () {
+        $.ajax({
+            type: "get",
+            url: "/Wycieczka/ListaWycieczek"
+        })
+            .done(function (partialViewResult) {
+                $("#articles_partial").html(partialViewResult);
+            });
+    });
+
+        //Dodawanie wycieczki - wysłanie
+    function dodaj_wycieczke(dataR, pocz, kon, trasa) {
+        $.ajax({
+            type: "get",
+            url: "/Wycieczka/DodajFragment",
+            data: { dataR: dataR, pocz: pocz, kon: kon, trasa: trasa }
+        }).done(function (partialViewResult) {
+            $('.modal-backdrop').remove();
+            $("#create_wycieczka").html(partialViewResult);
+        });
+        };
+
+        //Dodawanie wycieczki - ekran tworzenia
+    function pokaz_dodawanie_wycieczki() {
+        $.ajax({
+            type: "get",
+            url: "/Wycieczka/DodajFragment",
+            data: { other: true }
+        }).done(function (partialViewResult) {
+            $('.modal-backdrop').remove();
+            $("#create_wycieczka").html(partialViewResult);
+            $("#articles_partial").toggle()
+        });
+    };
+        //Usuwanie ostatniego fragmentu
+    function remove_last() {
+        $.ajax({
+            type: "get",
+            url: "/Wycieczka/RemoveOstatni",
+            data: {  }
+        }).done(function (partialViewResult) {
+            $("#create_wycieczka").html(partialViewResult);
+            alert("Usunięto ostatni fragment!");
+        });
+        };
+
+    function usun_wycieczke(idW) {
+        $.ajax({
+            type: "get",
+            url: "/Wycieczka/UsunWycieczke",
+            data: { id:idW }
+        })
+            .done(function (partialViewResult) {
+                $("#articles_partial").html(partialViewResult);
+            });
+        };
+        
+    var previewFile = function (event) {
+        var reader = new FileReader();
+        reader.onload = function () {
+            var output = document.getElementById('preview');
+            output.src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+        };
+
+        //Wyświetlanie dowodu w powiększeniu
+        $(document).on("click", " .dowod", function () {
+            $('#imagepreview').attr('src', $(this).find("img").attr('src')); // here asign the image to the modal when the user click the enlarge link
+            $('#imagemodal').modal('show'); // imagemodal is the id attribute assigned to the bootstrap modal, then i use the show function
+        });
+
+        function filtruj_wycieczki() {
+
+            var zatwierdzona = $('#ZatwierdzonaFilter').is(':checked');
+            var niezatwierdzona = $('#NiezatwierdzonaFilter').is(':checked');
+            var pkt_od = document.getElementById("LiczbaPktOdFilter").value;
+            var pkt_do = document.getElementById("LiczbaPktDoFilter").value;
+            var data_od = document.getElementById("DataOdFilter").value;
+            var data_do = document.getElementById("DataDoFilter").value;
+            $.ajax({
+                type: "post",
+                url: "/Wycieczka/FiltrujWycieczki",
+                data: { zatwierdzona: zatwierdzona, niezatwierdzona: niezatwierdzona, pkt_od: pkt_od, pkt_do: pkt_do, data_od: data_od, data_do: data_do }
+            }).done(function (result) {
+                $("#articles_partial").html(result);
+                $('.modal-backdrop').remove();
+            });
+        };
+
+    </script>
+}

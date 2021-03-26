@@ -1,0 +1,83 @@
+﻿@model Got_PTTK_PO.Models.Wycieczka
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Wycieczka</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.NumerK)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NumerK)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DataRozp)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DataRozp)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DataZak)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DataZak)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CzyZaliczona)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CzyZaliczona)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TrasyWycieczki)
+        </dt>
+        <dd class="col-sm-10">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Nazwa Trasy
+                        </th>
+                        <th>
+                            Początek
+                        </th>
+                        <th>
+                            Koniec
+                        </th>
+                        <th>
+                            Punkty
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var region in ViewData["Trasy"] as IEnumerable<Trasa>)
+                    {
+                    <tr>
+                        <td>
+                            @region.NazwaT
+                        </td>
+                        <td>
+                            @region.NazwaPP
+                        </td>
+                        <td>
+                            @region.NazwaPK
+                        </td>
+                        <td>
+                            @region.LiczbaPkt
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.IdW">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

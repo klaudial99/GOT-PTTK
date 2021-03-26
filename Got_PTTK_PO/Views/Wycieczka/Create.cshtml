@@ -1,0 +1,164 @@
+﻿@model Got_PTTK_PO.ViewModels.TrasaWycieczkaVM
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Wycieczka</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="NumerK" class="control-label"></label>
+                <input asp-for="NumerK" class="form-control" type="hidden" value=3 />
+                <span asp-validation-for="NumerK" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DataRozp" class="control-label"></label>
+                <input asp-for="DataRozp" class="form-control" />
+                <span asp-validation-for="DataRozp" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DataZak" class="control-label"></label>
+                <input asp-for="DataZak" class="form-control" />
+                <span asp-validation-for="DataZak" class="text-danger"></span>
+            </div>
+            <input class="form-check-input" asp-for="CzyZaliczona" type="hidden" value=false />
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                <label asp-for="DataRozp" class="control-label"></label>
+            </th>
+            <th>
+                <label asp-for="NazwaPP" class="control-label"></label>
+            </th>
+            <th>
+                <label asp-for="NazwaPK" class="control-label"></label>
+            </th>
+            <th>
+                CzyZaliczona
+            </th>
+            <th>
+                CzyZaliczony
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <input asp-for="DataRozp" class="form-control" />
+                <span asp-validation-for="DataRozp" class="text-danger"></span>
+            </td>
+            <td>
+                <select asp-for="NazwaPP" class="form-control" asp-items=@(ViewData["NazwaPP"] as SelectList)></select>
+
+            </td>
+            <td>
+                <select asp-for="NazwaPK" class="form-control" id="NazwaPK" name="NazwaPK" asp-items=@(new SelectList(string.Empty, "NazwaP","NazwaP"))></select>
+
+            </td>
+            <td>
+                <input class="form-check-input" asp-for="CzyZaliczona" type="hidden" value=false />
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => modelItem.CzyZaliczony)
+            </td>
+            <td>
+                <a asp-action="Edit">Add</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input asp-for="DataRozp" class="form-control" />
+                <span asp-validation-for="DataRozp" class="text-danger"></span>
+            </td>
+            <td>
+                <select asp-for="NazwaPP" class="form-control" asp-items=@(ViewData["NazwaPP"] as SelectList)></select>
+
+            </td>
+            <td>
+                <select asp-for="NazwaPK" class="form-control" id="NazwaPK" name="NazwaPK" asp-items=@(new SelectList(string.Empty, "NazwaP","NazwaP"))></select>
+
+            </td>
+            <td>
+                <input class="form-check-input" asp-for="CzyZaliczona" type="hidden" value=false />
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => modelItem.CzyZaliczony)
+            </td>
+            <td>
+                <a asp-action="Edit">Add</a>
+            </td>
+        </tr>
+    </tbody>
+    </table>
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="DataRozp" class="control-label"></label>
+                    <input asp-for="DataRozp" class="form-control" />
+                    <span asp-validation-for="DataRozp" class="text-danger"></span>
+                    <label asp-for="NazwaPP" class="control-label"></label>
+                    @*@Html.DropDownListFor(model => model.NazwaPP, ViewBag.NazwaPP as SelectList, "---", new { @class="form-control" })*@
+                    <select asp-for="NazwaPP" class="form-control" asp-items=@(ViewData["NazwaPP"] as SelectList)></select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="NazwaPK" class="control-label"></label>
+                    @*@Html.DropDownListFor(model => model.NazwaPK, new SelectList(" "), "---", new { @class = "form-control" })*@
+                    <select asp-for="NazwaPK" class="form-control" id="NazwaPK" name="NazwaPK" asp-items=@(new SelectList(string.Empty, "NazwaP","NazwaP"))></select>
+                </div>
+                <input class="form-check-input" asp-for="CzyZaliczona" type="hidden" value=false />
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
+
+
+
+
+    <script src="/lib/jquery/dist/jquery.js"></script>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        <script type="text/javascript">
+    $(document).ready(function () {
+        var items = "<option value='0'>Select</option>";
+        $('#NazwaPK').html(items);
+    });
+
+    $('#NazwaPP').change(function () {
+        var url = '@Url.Content("~/")' + "Wycieczka/GetPoints";
+        var ddlsource = "#NazwaPP";
+        $.getJSON(url, { NazwaPP: $(ddlsource).val() }, function (data) {
+            var items = '';
+            $("#NazwaPK").empty();
+            $.each(data, function (i, koncowy) {
+                items += "<option value='" + koncowy.value + "'>" + koncowy.text + "</option>";
+            });
+            $('#NazwaPK').html(items);
+        });
+    });
+        </script>
+    }

@@ -1,0 +1,91 @@
+﻿@model Got_PTTK_PO.Models.Punkt
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Punkt</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.NazwaP)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NazwaP)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SzerGeo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SzerGeo)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DlGeo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DlGeo)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Rodzaj)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Rodzaj)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WysNpm)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WysNpm)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.RegionyGorskie)
+        </dt>
+        <dd class="col-sm-10">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Region Górski
+                        </th>
+                        <th>
+                            Obszar Górski
+                        </th>
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var region in ViewData["Regiony"] as IEnumerable<RegionGorski>)
+                    {
+                        <tr>
+                            <td>
+                                @region.IdRG
+                            </td>
+                            <td>
+                                @region.NazwaOG
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @*@foreach (var region in ViewData["Regiony"] as IEnumerable<RegionGorski>)
+            {
+                <p>@region.IdRG  @region.NazwaOG</p>
+            }*@
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.RegionyGorskie)
+        </dt>
+        <dd class="col-sm-10">
+            @foreach (var teren in ViewData["Tereny"] as IEnumerable<TerenGorski>)
+            { <a>@(teren.NazwaTG),</a> }
+            </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.NazwaP">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
